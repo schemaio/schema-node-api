@@ -1,0 +1,67 @@
+{
+  "name": "schema-api",
+  "version": "1.0.1",
+  "private": true,
+  "engines": {
+    "node": "6.5.0",
+    "npm": "3.10.3"
+  },
+  "dependencies": {
+    "apicache": "0.1.0",
+    "bluebird": "3.4.6",
+    "body-parser": "1.15.2",
+    "compression": "1.6.2",
+    "cors": "2.8.0",
+    "debug": "2.2.0",
+    "dotenv": "2.0.0",
+    "express": "4.14.0",
+    "express-enforces-ssl": "1.1.0",
+    "express-promise": "0.4.0",
+    "lodash": "4.15.0",
+    "morgan": "1.7.0",
+    "nconf": "0.8.4",
+    "schema-client": "2.2.1"
+  },
+  "devDependencies": {
+    "chai": "3.5.0",
+    "chai-as-promised": "5.3.0",
+    "chai-datetime": "1.4.1",
+    "doctoc": "1.2.0",
+    "eslint": "3.4.0",
+    "eslint-plugin-import": "1.13.0",
+    "mocha": "3.0.2",
+    "nodemon": "1.10.2",
+    "sinon": "1.17.5",
+    "sinon-as-promised": "4.0.2"
+  },
+  "eslintConfig": {
+    "globals": {
+      "__DEV__": true,
+      "debug": true
+    },
+    "env": {
+      "node": true,
+      "es6": true
+    },
+    "rules": {
+      "no-param-reassign": 0,
+      "no-underscore-dangle": 0,
+      "no-confusing-arrow": 0,
+      "no-unused-vars": 1
+    },
+    "parserOptions": {
+      "sourceType": "module"
+    }
+  },
+  "scripts": {
+    "watch": "nodemon --harmony server.js",
+    "start": "node --harmony --optimize_for_size --max_old_space_size=460 --gc_interval=100 server.js",
+    "test": "mocha --require test/index.js --recursive test/api --timeout 1000 --slow 200",
+    "lint": "npm run eslint",
+    "eslint": "npm run eslint:root && npm run eslint:api",
+    "eslint:root": "eslint server.js env.js",
+    "eslint:api": "eslint --ext .js --ignore-path .gitignore api",
+    "docs": "doctoc .",
+    "sloc": "sloc -e \"(node_modules|build|assets|\\.html$|\\.xml$|\\.svg$)\" -k total,source,comment -f cli-table ."
+  }
+}
