@@ -3,22 +3,23 @@
 A standalone API for JS and other clients to use with Schema. Extend basic endpoints with your own custom functionality, for example, validating user input special or scoping product queries for client usage.
 
 ```
-Schema.io <===> NodeJS API (This Package) <===> Your App (React/Angular/Ember/Rails/Etc)
+Schema.io <==> NodeJS API (This Package) <==> Your App (React/Angular/Ember/Rails/Etc)
 ```
 
 ## Getting Started
 
-- Create `.env` file and set to `development` values (see example `.env` file)
+- Clone this repository
+- Create `.env` file in the repository and set `development` values (see example `.env` file)
 - Run `nvm install` (make sure you have [nvm installed](https://github.com/creationix/nvm))
 - Run `npm install`
 - Run `npm run watch`
 
 ### Example .env file
 
-```
+```bash
 NODE_ENV=development
 PORT=3001
-FORCE_SSL=true // if you want to redirect all requests to https
+FORCE_SSL=true # redirect all requests to https
 SCHEMA_CLIENT_ID=my-client-id
 SCHEMA_CLIENT_KEY=my-client-key
 ```
@@ -41,7 +42,7 @@ It's not strictly required to pass the session header, but certain endpoints wil
 
 #### Get current account (session required)
 
-```
+```json
 GET /v1/account
 ```
 
@@ -49,13 +50,12 @@ Sensitive fields may be removed from the response. See `api/v1/account.js` for d
 
 #### Update current account
 
-```
+```json
 PUT /v1/account
 {
   "first_name": "Example",
   "last_name": "Customer",
-  "email": "customer@example.com",
-  ...
+  "email": "customer@example.com"
 }
 ```
 
@@ -63,13 +63,12 @@ Only specific fields may be updated. See `api/v1/account.js` for details.
 
 #### Create account for the current user
 
-```
+```json
 POST /v1/account
 {
   "first_name": "Example",
   "last_name": "Customer",
-  "email": "customer@example.com",
-  ...
+  "email": "customer@example.com"
 }
 ```
 
@@ -77,7 +76,7 @@ Only specific fields may be created. See `api/v1/account.js` for details.
 
 #### Login to account
 
-```
+```json
 POST /v1/account/login
 {
   "email": "customer@example.com",
@@ -89,7 +88,7 @@ If email and password are correct, an account record will be returned. Otherwise
 
 #### Logout of current account
 
-```
+```json
 POST /v1/account/logout
 ```
 
@@ -97,7 +96,7 @@ This will remove the previously logged in `account_id` from the session.
 
 #### Send password recovery email
 
-```
+```json
 POST /v1/account/recover
 {
   "email": "customer@example.com",
@@ -109,7 +108,7 @@ This will send an email to the account if one found, that contains the `reset_ur
 
 #### Reset password from recovery email
 
-```
+```json
 POST /v1/account/recover
 {
   "reset_key": "iud287ebuf9uwf92fdi2uhef872h",
@@ -123,7 +122,7 @@ This will reset an account's password if the `reset_key` is found. If successful
 
 #### Get current cart details (session required)
 
-```
+```json
 GET /v1/cart
 ```
 
@@ -131,7 +130,7 @@ Sensitive fields may be removed from the response. See `api/v1/cart.js` for deta
 
 #### Update current cart details
 
-```
+```json
 PUT /v1/cart
 {
   "shipping": {
@@ -177,7 +176,7 @@ If the cart does not exist for the current session, it will be automatically cre
 
 #### Create cart for the current user
 
-```
+```json
 POST /v1/cart
 ```
 
@@ -185,7 +184,7 @@ This will create a cart for the current session, if one does not already exist. 
 
 #### Add item to cart
 
-```
+```json
 POST /v1/cart/add-item
 {
   "product_id": "...",
@@ -205,7 +204,7 @@ If the same product and options already exist in the cart, then its quantity wil
 
 #### Remove item from cart
 
-```
+```json
 POST /v1/cart/remove-item
 {
   "item_id": "..."
@@ -214,9 +213,22 @@ POST /v1/cart/remove-item
 
 This will remove an item from the cart matching `item_id`. You can get the item ID value from any of the previous calls to the cart endpoint.
 
+#### Apply a coupon
+
+```json
+POST /v1/cart/apply-coupon
+{
+  "code": "SHIPFREE"
+}
+```
+
+This will apply a valid coupon code to the cart and affect all relevant prices. If the coupon code is not found or is not valid, the server will respond with status `400` and an error message.
+
+To remove an applied coupon, make the same request with `"code": null`.
+
 #### Get shipping prices
 
-```
+```json
 GET /v1/cart/shipment-rating
 ```
 
@@ -226,7 +238,7 @@ The typical flow is to update the cart with shipping information first, then mak
 
 ### Convert cart to order
 
-```
+```json
 POST /v1/cart/checkout
 ```
 
@@ -238,7 +250,7 @@ If successful, an order record will be returned. Otherwise an error.
 
 #### Get category by slug or ID
 
-```
+```json
 GET /v1/categories/:slug
 ```
 
@@ -246,13 +258,13 @@ Sensitive fields may be removed from the response. See `api/v1/categories.js` fo
 
 #### Get sub-categories by slug or ID
 
-```
+```json
 GET /v1/categories/:slug/children
 ```
 
 #### Get products in a category
 
-```
+```json
 GET /v1/categories/:slug/products
 ```
 
@@ -264,7 +276,7 @@ Note: If you want to get products in a single category only and ignore sub-categ
 
 #### Get a product
 
-```
+```json
 GET /v1/products/:id
 ```
 
@@ -272,7 +284,7 @@ Sensitive fields may be removed from the response. See `api/v1/products.js` for 
 
 #### Get products in a category
 
-```
+```json
 GET /v1/products?category=:slug
 ```
 
@@ -284,7 +296,7 @@ Note: If you want to get products including all sub-categories, then see `/v1/ca
 
 #### Subscribe contact to email list(s)
 
-```
+```json
 POST /v1/contacts/subscribe
 {
   "first_name": "Example",
@@ -298,7 +310,7 @@ All fields are optional except `email`. You may use `email_optin_lists` for trac
 
 #### Unsubscribe contact from email list(s)
 
-```
+```json
 POST /v1/contacts/unsubscribe
 {
   "email": "customer@example.com",
@@ -313,7 +325,7 @@ This will flip the `email_optin` field to false on the contact record. If `email
 
 #### Get a page
 
-```
+```json
 GET /v1/pages/:id
 ```
 
@@ -321,7 +333,7 @@ Pages are used to store content such as About Us, Privacy Policy, etcetera.
 
 #### Get page articles
 
-```
+```json
 GET /v1/pages/:id/articles
 ```
 
@@ -330,7 +342,7 @@ Articles are useful for different things depending on the page itself. For examp
 
 #### Get a page article
 
-```
+```json
 GET /v1/pages/:id/articles/:article_id
 ```
 
@@ -338,7 +350,7 @@ GET /v1/pages/:id/articles/:article_id
 
 #### Get current session details
 
-```
+```json
 GET /v1/session
 ```
 
@@ -346,7 +358,7 @@ This will return current session data, including `account_id` and `cart_id`, alo
 
 #### Update current session details
 
-```
+```json
 PUT /v1/session
 {
   "arbitrary_field": "example"
@@ -357,13 +369,11 @@ Update the current session with any fields that might be useful to your client. 
 
 ## Testing
 
-To run all tests:
-
-```
+```bash
 npm test
 ```
 
-As a best practice, you should write new tests for new or modified endpoints.
+As a best practice, you should write tests for all new or modified endpoints.
 
 #### Schema client testing
 
@@ -371,7 +381,7 @@ The test setup includes a Schema client that should be used to stub itself with 
 
 Here's an example using this test client:
 
-```
+```javascript
 const schema = Test.schemaClient();
 const api = Test.apiClient(schema);
 

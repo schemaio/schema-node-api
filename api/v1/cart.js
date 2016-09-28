@@ -13,6 +13,7 @@ cart.init = (env, router, schema) => {
   router.post('/cart', requireSession, cart.create.bind(this, schema));
   router.post('/cart/add-item', requireSession, cart.addItem.bind(this, schema));
   router.post('/cart/remove-item', requireSession, cart.removeItem.bind(this, schema));
+  router.post('/cart/apply-coupon', requireSession, cart.applyCoupon.bind(this, schema));
   router.get('/cart/shipment-rating', requireSession, cart.shipmentRating.bind(this, schema));
   router.post('/cart/checkout', requireSession, cart.checkout.bind(this, schema));
 };
@@ -100,12 +101,26 @@ cart.removeItem = (schema, req) => {
   }
   return schema.delete('/carts/{cart_id}/items/{item_id}', {
     cart_id: req.session.cart_id,
-    item_id: req.body.item_id
+    item_id: req.body.item_id,
   }).then(() => {
     return cart.get(schema, req);
   });
 };
 
+// Apply a coupon code
+cart.applyCoupon = (schema, req) => {
+  return schema.put('/carts/{cart_id}', {
+    cart_id: req.session.cart_id,
+    coupon_code: req.body.code || req.body.coupon_code || null,
+  }).then(result => {
+    if (result.errors && result.errors.coupon_code) {
+      throw util.error(400, 'Coupon code is not valid');
+    }
+    return cart.get(schema, req);
+  });
+};
+
+// Ensure shipping fields are sane
 cart.sanitizeShipping = (shipping) => {
   shipping = util.filterData(shipping, [
     'name',
@@ -122,6 +137,7 @@ cart.sanitizeShipping = (shipping) => {
   return shipping;
 },
 
+// Ensure billing fields are sane
 cart.sanitizeBilling = (billing) => {
   billing = util.filterData(billing, [
     'name',

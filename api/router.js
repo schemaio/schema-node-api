@@ -45,8 +45,9 @@ module.exports = () => {
 
 // Graceful error handler
 function handleRouterError(err, res) {
+  const message =  err.toString().replace('Error: ', '');
   res.status(err.code || 500).json({
-    error: err.code ? err.toString() : 'Internal Server Error'
+    error: err.code ? message : 'Internal Server Error'
   });
   if (!err.code) {
     console.log(err);
