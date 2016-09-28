@@ -8,7 +8,8 @@ Schema.io <==> NodeJS API (This Package) <==> Your App (React/Angular/Ember/Rail
 
 ## Getting Started
 
-- Create `.env` file and set to `development` values (see example `.env` file)
+- Clone this repository
+- Create `.env` file in the repository and set `development` values (see example `.env` file)
 - Run `nvm install` (make sure you have [nvm installed](https://github.com/creationix/nvm))
 - Run `npm install`
 - Run `npm run watch`
