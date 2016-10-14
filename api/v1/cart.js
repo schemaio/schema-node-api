@@ -139,6 +139,7 @@ cart.sanitizeShipping = (shipping) => {
 
 // Ensure billing fields are sane
 cart.sanitizeBilling = (billing) => {
+  delete billing.method;
   billing = util.filterData(billing, [
     'name',
     'address1',
