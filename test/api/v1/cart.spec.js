@@ -16,6 +16,20 @@ schema.expectCart = (props) => {
   return schema;
 };
 
+schema.expectCartResult = (props) => {
+  schema.expects([
+    {
+      method: 'get',
+      url: '/carts/{id}',
+      result: {
+        id: 123,
+        items: [ item ],
+      },
+    },
+  ]);
+  return schema;
+};
+
 describe('/v1/cart', () => {
   schema.init();
 
@@ -89,6 +103,14 @@ describe('/v1/cart', () => {
             shipping: { name: 'Test Customer' },
           },
         },
+        {
+          method: 'get',
+          url: '/carts/{id}',
+          result: {
+            id: 123,
+            shipping: { name: 'Test Customer' },
+          },
+        },
       ]);
       return api.put('/v1/cart', {
         shipping: { name: 'Test Customer' },
@@ -115,6 +137,17 @@ describe('/v1/cart', () => {
               quantity: 2,
             }],
           },
+          result: {
+            id: 123,
+            items: [{
+              product_id: 1,
+              quantity: 2,
+            }],
+          },
+        },
+        {
+          method: 'get',
+          url: '/carts/{id}',
           result: {
             id: 123,
             items: [{
@@ -173,6 +206,14 @@ describe('/v1/cart', () => {
             shipping: { name: 'Test Customer' },
           },
         },
+        {
+          method: 'get',
+          url: '/carts/{id}',
+          result: {
+            id: 123,
+            shipping: { name: 'Test Customer' },
+          },
+        },
       ]);
       return api.post('/v1/cart', {
         shipping: { name: 'Test Customer' },
@@ -198,6 +239,17 @@ describe('/v1/cart', () => {
               quantity: 2,
             }],
           },
+          result: {
+            id: 123,
+            items: [{
+              product_id: 1,
+              quantity: 2,
+            }],
+          },
+        },
+        {
+          method: 'get',
+          url: '/carts/{id}',
           result: {
             id: 123,
             items: [{
@@ -242,12 +294,13 @@ describe('/v1/cart', () => {
           },
         },
         {
-          method: 'put',
-          url: '/carts/{cart_id}',
-          data: {
-            cart_id: 123,
-            items: [ item ],
-          },
+          method: 'post',
+          url: '/carts/{cart_id}/items',
+          data: _.merge({}, item, { cart_id: 123 }),
+        },
+        {
+          method: 'get',
+          url: '/carts/{id}',
           result: {
             id: 123,
             items: [ item ],

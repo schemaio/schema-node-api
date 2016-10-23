@@ -21,7 +21,7 @@ cart.init = (env, router, schema) => {
 cart.get = (schema, req) => {
   return schema.get('/carts/{id}', {
     id: req.session.cart_id,
-    expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant'
+    expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
   });
 };
 
