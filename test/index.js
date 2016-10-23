@@ -83,7 +83,14 @@ Test.schemaClient = (sessionId) => {
         method: 'get',
         url: '/:sessions/{id}',
         result: _.merge({ id: sessionId }, props),
-      }
+      },
+      {
+        method: 'get',
+        url: '/:clients/:self',
+        result: {
+          id: 'test',
+        },
+      },
     ]);
     return schema;
   };
@@ -97,8 +104,15 @@ Test.schemaClient = (sessionId) => {
         result: {
           id: sessionId,
           account_id: null,
-        }
-      }
+        },
+      },
+      {
+        method: 'get',
+        url: '/:clients/:self',
+        result: {
+          id: 'test',
+        },
+      },
     ]);
     return schema;
   };
@@ -112,8 +126,15 @@ Test.schemaClient = (sessionId) => {
         result: {
           id: sessionId,
           account_id: sessionId,
-        }
-      }
+        },
+      },
+      {
+        method: 'get',
+        url: '/:clients/:self',
+        result: {
+          id: 'test',
+        },
+      },
     ]);
     return schema;
   };

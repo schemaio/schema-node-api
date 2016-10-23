@@ -52,23 +52,29 @@ session.getByRequest = (schema, req) => {
       return;
     }
     return schema.get('/:sessions/{id}', {
-      id: req.sessionID
+      id: req.sessionID,
     }).then(result => {
       if (result) {
         return result;
       }
       return schema.put('/:sessions/{id}', {
-        id: req.sessionID
+        id: req.sessionID,
       });
     }).then(result => {
       // Map client info to session
-      return schema.get('/:clients/:self').then(self => {
-        result = result.toObject();
-        result.currency = self.currency;
-        result.locale = self.locale;
-        result.timezone = self.timezone;
-        return result;
-      });
+      if (result) {
+        return schema.get('/:clients/:self').then(self => {
+          if (self) {
+            if (result.toObject) {
+              result = result.toObject();
+            }
+            result.currency = self.currency;
+            result.locale = self.locale;
+            result.timezone = self.timezone;
+          }
+          return result;
+        });
+      }
     });
   });
 };
