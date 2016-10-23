@@ -161,8 +161,8 @@ cart.sanitizeBilling = (billing) => {
       'token',
       'brand',
       'last4',
-      'expire_month',
-      'expire_year'
+      'exp_month',
+      'exp_year'
     ]);
   }
   return billing;
