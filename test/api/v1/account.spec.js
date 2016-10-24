@@ -325,13 +325,13 @@ describe('/v1/account', () => {
           method: 'get',
           url: '/accounts/:first',
           data: {
-            password_reset_key: 'test_key'
+            password_reset_key: 'test_key',
           },
           result: {
             id: 123,
             password_reset_expired: Date.now() - 1,
-          }
-        }
+          },
+        },
       ]);
       return api.post('/v1/account/recover', {
         reset_key: 'test_key',
@@ -340,6 +340,82 @@ describe('/v1/account', () => {
         assert.ok(result.errors);
         assert.ok(result.errors.reset_key);
         assert.strictEqual(result.errors.reset_key.code, 'INVALID');
+      });
+    });
+  });
+
+  describe('GET /v1/account/orders', () => {
+    it('throws an error when logged out', () => {
+      return api.get('/v1/account/orders').then(result => {
+        assert.ok(result && result.error);
+      });
+    });
+
+    describe('when logged in', () => {
+      beforeEach(() => {
+        schema.reset();
+        schema.expectLoggedIn();
+      });
+
+      it('returns account orders', () => {
+        schema.expects([
+          {
+            method: 'get',
+            url: '/orders',
+            data: {
+              account_id: schema.sessionId,
+              fields: undefined,
+              limit: undefined,
+            },
+            result: {
+              count: 0,
+              results: [],
+            },
+          },
+        ]);
+        return api.get('/v1/account/orders').then(result => {
+          assert.deepEqual(result, {
+            count: 0,
+            results: [],
+          });
+        });
+      });
+    });
+  });
+
+  describe('GET /v1/account/orders/:id', () => {
+    it('throws an error when logged out', () => {
+      return api.get('/v1/account/orders/1').then(result => {
+        assert.ok(result && result.error);
+      });
+    });
+
+    describe('when logged in', () => {
+      beforeEach(() => {
+        schema.reset();
+        schema.expectLoggedIn();
+      });
+
+      it('returns account orders', () => {
+        schema.expects([
+          {
+            method: 'get',
+            url: '/orders/{id}',
+            data: {
+              id: '1',
+              account_id: schema.sessionId,
+              fields: undefined,
+            },
+            result: {
+              id: '1',
+            },
+          },
+        ]);
+        return api.get('/v1/account/orders/1').then(result => {
+          assert.deepEqual(result, {
+            id: '1',
+          });
+        });
       });
     });
   });

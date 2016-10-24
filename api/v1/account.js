@@ -6,21 +6,29 @@ const account = module.exports;
 // Init routes
 account.init = (env, router, schema) => {
   const requireSession = session.require.bind(this, schema);
-  router.get('/account', requireSession, account.get.bind(this, schema));
-  router.put('/account', requireSession, account.update.bind(this, schema));
+  const requireAccount = account.require.bind(this, schema);
+  router.get('/account', requireSession, requireAccount, account.get.bind(this, schema));
+  router.put('/account', requireSession, requireAccount, account.update.bind(this, schema));
   router.post('/account', requireSession, account.create.bind(this, schema));
   router.post('/account/login', requireSession, account.login.bind(this, schema));
   router.post('/account/logout', requireSession, account.logout.bind(this, schema));
   router.post('/account/recover', requireSession, account.recover.bind(this, schema));
+  router.get('/account/orders', requireSession, requireAccount, account.getOrders.bind(this, schema));
+  router.get('/account/orders/:id', requireSession, requireAccount, account.getOrderById.bind(this, schema));
+};
+
+// Require logged in account
+account.require = (schema, req, res, next) => {
+  if (!req.session.account_id) {
+    return res.status(400).json({
+      error: 'Account must be logged in to access this resource'
+    });
+  }
+  next();
 };
 
 // Get current account
 account.get = (schema, req, res) => {
-  if (!req.session.account_id) {
-    return res.status(400).json({
-      error: 'Account must be logged in before #get'
-    });
-  }
   return schema.get('/accounts/{id}', {
     id: req.session.account_id
   });
@@ -28,11 +36,6 @@ account.get = (schema, req, res) => {
 
 // Update current account
 account.update = (schema, req, res) => {
-  if (!req.session.account_id) {
-    return res.status(400).json({
-      error: 'Account must be logged in before #update'
-    });
-  }
   req.body.id = req.session.account_id;
   const error = account.filterData(req);
   if (error) {
@@ -278,4 +281,24 @@ account.filterData = (req) => {
   } catch (err) {
     return { error: err.toString() };
   }
+};
+
+// Get account orders list
+account.getOrders = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/orders', {
+    account_id: req.session.account_id,
+    fields: query.fields,
+    limit: query.limit,
+  });
+};
+
+// Get account orders list
+account.getOrderById = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/orders/{id}', {
+    account_id: req.session.account_id,
+    id: req.params.id,
+    fields: query.fields,
+  });
 };
