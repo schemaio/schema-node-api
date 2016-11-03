@@ -290,6 +290,7 @@ account.getOrders = (schema, req) => {
     account_id: req.session.account_id,
     fields: query.fields,
     limit: query.limit,
+    expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
   });
 };
 
@@ -300,5 +301,6 @@ account.getOrderById = (schema, req) => {
     account_id: req.session.account_id,
     id: req.params.id,
     fields: query.fields,
+    expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
   });
 };
