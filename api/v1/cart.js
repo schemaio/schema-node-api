@@ -2,6 +2,7 @@ const _ = require('lodash');
 const Promise = require('bluebird');
 const util = require('../util');
 const session = require('./session');
+const account = require('./account');
 
 const cart = module.exports;
 
@@ -213,9 +214,15 @@ cart.checkout = (schema, req) => {
     // Remove cart ID from session
     return schema.put('/:sessions/{id}', {
       id: req.sessionID,
-      cart_id: null
-    }).then(() => {
-      return order;
+      cart_id: null,
+      order_id: order.id,
+    });
+  }).then(session => {
+    return account.getOrderById(schema, {
+      session: req.session,
+      params: {
+        id: session.order_id,
+      },
     });
   });
 };
