@@ -140,7 +140,6 @@ cart.sanitizeShipping = (shipping) => {
     'zip',
     'country',
     'phone',
-
     'account_address_id',
     'service',
   ]);
@@ -233,12 +232,14 @@ cart.checkout = (schema, req) => {
       order_id: order.id,
     });
   }).then(session => {
-    return account.getOrderById(schema, {
-      session: req.session,
-      params: {
-        id: session.order_id,
-      },
-    });
+    return schema.get('/orders/{id}', { id: session.order_id });
+    // TODO: fix this
+    // return account.getOrderById(schema, {
+    //   session: req.session,
+    //   params: {
+    //     id: session.order_id,
+    //   },
+    // });
   });
 };
 
