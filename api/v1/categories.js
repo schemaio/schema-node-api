@@ -17,6 +17,7 @@ categories.getById = (schema, req) => {
   return schema.get('/categories/{id}', {
     id: req.params.id,
     where: categories.defaultQuery(req),
+    sort: categories.defaultSort(req),
   });
 };
 
@@ -25,6 +26,7 @@ categories.getChildren = (schema, req) => {
   return schema.get('/categories/{id}/children', {
     id: req.params.id,
     where: categories.defaultQuery(req),
+    sort: categories.defaultSort(req),
     include: categories.filterIncludeQuery(req),
   });
 };
@@ -61,6 +63,7 @@ categories.getAllChildIdsRecursive = (schema, req, parentIds, ids) => {
     id: { $in: parentIds },
     fields: 'id',
     where: categories.defaultQuery(req),
+    sort: categories.defaultSort(req),
     include: {
       children: {
         url: '/categories',
@@ -100,6 +103,13 @@ categories.defaultQuery = (req) => {
   return {
     active: true,
     navigation: req.query.navigation || undefined,
+  }
+};
+
+// Default sort
+categories.defaultSort = (req) => {
+  return {
+    sort: 'sort ascending',
   }
 };
 
