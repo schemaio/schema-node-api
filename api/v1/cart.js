@@ -125,6 +125,11 @@ cart.applyCoupon = (schema, req) => {
 cart.sanitizeShipping = (shipping) => {
   delete shipping.service_name;
   delete shipping.price;
+  if (shipping.first_name) {
+    shipping.name = shipping.first_name +' '+shipping.last_name;
+    delete shipping.first_name;
+    delete shipping.last_name;
+  }
   shipping = util.filterData(shipping, [
     'name',
     'address1',
@@ -134,6 +139,7 @@ cart.sanitizeShipping = (shipping) => {
     'zip',
     'country',
     'phone',
+
     'account_address_id',
     'service',
   ]);
@@ -143,6 +149,11 @@ cart.sanitizeShipping = (shipping) => {
 // Ensure billing fields are sane
 cart.sanitizeBilling = (billing) => {
   delete billing.method;
+  if (billing.first_name) {
+    billing.name = billing.first_name +' '+billing.last_name;
+    delete billing.first_name;
+    delete billing.last_name;
+  }
   billing = util.filterData(billing, [
     'name',
     'address1',
