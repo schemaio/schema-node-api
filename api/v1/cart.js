@@ -115,7 +115,7 @@ cart.applyCoupon = (schema, req) => {
     coupon_code: req.body.code || req.body.coupon_code || null,
   }).then(result => {
     if (result.errors && result.errors.coupon_code) {
-      throw util.error(400, 'Coupon code is not valid');
+      return result;
     }
     return cart.get(schema, req);
   });
@@ -123,6 +123,8 @@ cart.applyCoupon = (schema, req) => {
 
 // Ensure shipping fields are sane
 cart.sanitizeShipping = (shipping) => {
+  delete shipping.service_name;
+  delete shipping.price;
   shipping = util.filterData(shipping, [
     'name',
     'address1',
@@ -133,7 +135,7 @@ cart.sanitizeShipping = (shipping) => {
     'country',
     'phone',
     'account_address_id',
-    'service'
+    'service',
   ]);
   return shipping;
 },
