@@ -118,6 +118,58 @@ POST /v1/account/recover
 
 This will reset an account's password if the `reset_key` is found. If successful, it will return an account record and automatically login using the current session. If the `reset_key` has expired or is not found, it will return an error.
 
+#### List account orders
+
+```json
+GET /v1/account/orders
+{
+  "limit": 10,
+  "page": 1
+}
+```
+
+Get a list of orders placed by the current logged in account.
+
+#### Get a single account order
+
+```json
+GET /v1/account/orders/:id
+```
+
+Get a single order placed by the current logged in account.
+
+#### List account addresses (Address Book)
+
+```json
+GET /v1/account/addresses
+```
+
+Get a list of addresses stored by the current logged in account.
+
+#### List account credit cards
+
+```json
+GET /v1/account/cards
+```
+
+Get a list of credit cards stored by the current logged in account.
+
+#### List account reviews
+
+```json
+GET /v1/account/reviews
+```
+
+Get a list of product reviews created by the current logged in account.
+
+#### List account credits
+
+```json
+GET /v1/account/credits
+```
+
+Get a list of credits applied to the current logged in account.
+
 ## /v1/cart
 
 #### Get current cart details (session required)

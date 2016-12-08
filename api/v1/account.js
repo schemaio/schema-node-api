@@ -7,7 +7,7 @@ const account = module.exports;
 account.init = (env, router, schema) => {
   const requireSession = session.require.bind(this, schema);
   const requireAccount = account.require.bind(this, schema);
-  router.get('/account', requireSession, requireAccount, account.get.bind(this, schema));
+  router.get('/account', requireSession, account.get.bind(this, schema));
   router.put('/account', requireSession, requireAccount, account.update.bind(this, schema));
   router.post('/account', requireSession, account.create.bind(this, schema));
   router.post('/account/login', requireSession, account.login.bind(this, schema));
@@ -15,6 +15,10 @@ account.init = (env, router, schema) => {
   router.post('/account/recover', requireSession, account.recover.bind(this, schema));
   router.get('/account/orders', requireSession, requireAccount, account.getOrders.bind(this, schema));
   router.get('/account/orders/:id', requireSession, requireAccount, account.getOrderById.bind(this, schema));
+  router.get('/account/addresses', requireSession, requireAccount, account.getAddresses.bind(this, schema));
+  router.get('/account/cards', requireSession, requireAccount, account.getCards.bind(this, schema));
+  router.get('/account/reviews', requireSession, requireAccount, account.getReviews.bind(this, schema));
+  router.get('/account/credits', requireSession, requireAccount, account.getCredits.bind(this, schema));
 };
 
 // Require logged in account
@@ -29,8 +33,11 @@ account.require = (schema, req, res, next) => {
 
 // Get current account
 account.get = (schema, req, res) => {
+  if (!req.session.account_id) {
+    return null;
+  }
   return schema.get('/accounts/{id}', {
-    id: req.session.account_id
+    id: req.session.account_id,
   });
 };
 
@@ -290,6 +297,7 @@ account.getOrders = (schema, req) => {
     account_id: req.session.account_id,
     fields: query.fields,
     limit: query.limit,
+    page: query.page,
     expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
   });
 };
@@ -302,5 +310,49 @@ account.getOrderById = (schema, req) => {
     id: req.params.id,
     fields: query.fields,
     expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
+  });
+};
+
+// Get account addresses list
+account.getAddresses = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/accounts/{id}/addresses', {
+    id: req.session.account_id,
+    fields: query.fields,
+    limit: query.limit,
+    page: query.page,
+  });
+};
+
+// Get account credit cards list
+account.getCards = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/accounts/{id}/cards', {
+    id: req.session.account_id,
+    fields: query.fields,
+    limit: query.limit,
+    page: query.page,
+  });
+};
+
+// Get account reviews list
+account.getReviews = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/reviews', {
+    account_id: req.session.account_id,
+    fields: query.fields,
+    limit: query.limit,
+    page: query.page,
+  });
+};
+
+// Get account credits list
+account.getCredits = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/accounts/{id}/credits', {
+    id: req.session.account_id,
+    fields: query.fields,
+    limit: query.limit,
+    page: query.page,
   });
 };
