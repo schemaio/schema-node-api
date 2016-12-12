@@ -45,12 +45,15 @@ categories.getAllProducts = (schema, req) => {
         return null;
       }
       return schema.get('/products', {
+        limit: req.query.limit || 25,
+        page: req.query.page || 1,
         $or: allCategoryIds.map(categoryId => {
           return {
-            'category_index.id': categoryId
+            'category_index.id': categoryId,
           };
         }),
         where: products.defaultQuery(req),
+        sort: categories.nestedProductSort(req, category.id),
       });
     });
   });
@@ -63,7 +66,6 @@ categories.getAllChildIdsRecursive = (schema, req, parentIds, ids) => {
     id: { $in: parentIds },
     fields: 'id',
     where: categories.defaultQuery(req),
-    sort: categories.defaultSort(req),
     include: {
       children: {
         url: '/categories',
@@ -110,6 +112,18 @@ categories.defaultQuery = (req) => {
 categories.defaultSort = (req) => {
   return {
     sort: 'sort ascending',
+  }
+};
+
+// Sorting for nested category products
+categories.nestedProductSort = (req, categoryId) => {
+  const sort = req.query.sort;
+  switch(sort) {
+    case undefined:
+    case 'featured':
+      return `category_index.sort.${categoryId} asc`;
+    default:
+      return sort;
   }
 };
 
