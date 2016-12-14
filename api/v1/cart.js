@@ -28,11 +28,9 @@ cart.get = (schema, req) => {
 
 cart.update = (schema, req) => {
   return cart.ensureExists(schema, req).then(() => {
-    var accountId = req.session.account_id;
     var cartData = {
       cart_id: req.session.cart_id,
-      account_id: accountId,
-      $promotions: true
+      $promotions: true,
     };
     if (req.body.items) {
       cartData.items = util.filterData(req.body.items, [
@@ -42,6 +40,13 @@ cart.update = (schema, req) => {
         'options',
         'quantity'
       ]);
+    }
+    var accountEmail = req.body.account && req.body.account.email;
+    if (accountEmail) {
+      cartData.account_id = null;
+      cartData.account = { email: accountEmail };
+    } else if (req.session.account_id) {
+      cartData.account_id = req.session.account_id;
     }
     if (req.body.shipping !== undefined) {
       cartData.shipping = cart.sanitizeShipping(req.body.shipping);
@@ -55,9 +60,20 @@ cart.update = (schema, req) => {
     if (req.body.shipment_rating !== undefined) {
       cartData.shipment_rating = req.body.shipment_rating;
     }
-    return schema.put('/carts/{cart_id}', cartData).then(() => {
-      return cart.get(schema, req);
+    return schema.put('/carts/{cart_id}', cartData).then(result => {
+      // Update anonymous account if created new
+      if (accountEmail && result.account.id && !result.account.name) {
+        return schema.put('/accounts/{account_id}', {
+          account_id: result.account.id,
+          first_name: cartData.shipping.first_name,
+          last_name: cartData.shipping.last_name,
+          shipping: cartData.shipping,
+          billing: cartData.billing,
+        });
+      }
     });
+  }).then(() => {
+    return cart.get(schema, req);
   });
 };
 
@@ -125,13 +141,13 @@ cart.applyCoupon = (schema, req) => {
 cart.sanitizeShipping = (shipping) => {
   delete shipping.service_name;
   delete shipping.price;
-  if (shipping.first_name) {
-    shipping.name = shipping.first_name +' '+shipping.last_name;
-    delete shipping.first_name;
-    delete shipping.last_name;
+  if (shipping.first_name || shipping.last_name) {
+    shipping.name = shipping.first_name + ' ' + shipping.last_name;
   }
   shipping = util.filterData(shipping, [
     'name',
+    'first_name',
+    'last_name',
     'address1',
     'address2',
     'company',
@@ -149,13 +165,13 @@ cart.sanitizeShipping = (shipping) => {
 // Ensure billing fields are sane
 cart.sanitizeBilling = (billing) => {
   delete billing.method;
-  if (billing.first_name) {
-    billing.name = billing.first_name +' '+billing.last_name;
-    delete billing.first_name;
-    delete billing.last_name;
+  if (billing.first_name || billing.last_name) {
+    billing.name = billing.first_name + ' ' + billing.last_name;
   }
   billing = util.filterData(billing, [
     'name',
+    'first_name',
+    'last_name',
     'address1',
     'address2',
     'company',

@@ -90,7 +90,8 @@ account.logout = (schema, req) => {
   return schema.put('/:sessions/{id}', {
     id: req.sessionID,
     account_id: null,
-    account_group: null
+    account_group: null,
+    email: null,
   }).return({
     success: true
   });
@@ -103,10 +104,12 @@ account.loginSession = (schema, req, result) => {
   }
   var accountId = result ? result.id : null;
   var accountGroup = result ? result.group : null;
+  var accountEmail = result ? result.email : null;
   return schema.put('/:sessions/{id}', {
     id: req.sessionID,
     account_id: accountId,
-    account_group: accountGroup
+    account_group: accountGroup,
+    email: accountEmail,
   }).then(() => {
     if (req.session.cart_id) {
       return schema.put('/carts/{id}', {
