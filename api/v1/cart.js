@@ -42,11 +42,11 @@ cart.update = (schema, req) => {
       ]);
     }
     var accountEmail = req.body.account && req.body.account.email;
-    if (accountEmail) {
+    if (req.session.account_id) {
+      cartData.account_id = req.session.account_id;
+    } else if (accountEmail) {
       cartData.account_id = null;
       cartData.account = { email: accountEmail };
-    } else if (req.session.account_id) {
-      cartData.account_id = req.session.account_id;
     }
     if (req.body.shipping !== undefined) {
       cartData.shipping = cart.sanitizeShipping(req.body.shipping);
