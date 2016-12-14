@@ -206,8 +206,11 @@ cart.sanitizeBilling = (billing) => {
 // Get cart shipment rating
 cart.shipmentRating = (schema, req) => {
   return cart.ensureExists(schema, req).then(() => {
-    req.body.shipment_rating = null;
-    return cart.update(schema, req);
+    return schema.put('/carts/{cart_id}', {
+      cart_id: req.session.cart_id,
+      shipping: req.body.shipping && cart.sanitizeShipping(req.body.shipping),
+      shipment_rating: null,
+    });
   }).then(result => {
     if (!result.items || !result.items.length) {
       return {
