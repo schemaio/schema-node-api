@@ -139,8 +139,10 @@ cart.applyCoupon = (schema, req) => {
 
 // Ensure shipping fields are sane
 cart.sanitizeShipping = (shipping) => {
+  // Restrict certain props
   delete shipping.service_name;
   delete shipping.price;
+  // First and last vs full name
   if (shipping.first_name || shipping.last_name) {
     shipping.name = shipping.first_name + ' ' + shipping.last_name;
   }
@@ -164,7 +166,9 @@ cart.sanitizeShipping = (shipping) => {
 
 // Ensure billing fields are sane
 cart.sanitizeBilling = (billing) => {
+  // Restrict certain props
   delete billing.method;
+  // First and last vs full name
   if (billing.first_name || billing.last_name) {
     billing.name = billing.first_name + ' ' + billing.last_name;
   }
