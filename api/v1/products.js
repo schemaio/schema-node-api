@@ -15,7 +15,9 @@ products.get = (schema, req) => {
     return products.getByCategory(schema, req);
   }
   return schema.get('/products', {
-    where: products.defaultQuery(req)
+    where: products.defaultQuery(req),
+    limit: req.query.limit || 15,
+    page: req.query.page || 1
   });
 };
 
@@ -39,7 +41,9 @@ products.getByCategory = (schema, req) => {
     return schema.get('/products', {
       'category_index.id': category.id,
       sort: 'category_index.sort.' + category.id,
-      where: products.defaultQuery(req)
+      where: products.defaultQuery(req),
+      limit: req.query.limit || 15,
+      page: req.query.page || 1
     });
   });
 };
