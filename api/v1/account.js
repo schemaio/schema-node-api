@@ -335,6 +335,9 @@ account.getCards = (schema, req) => {
     fields: query.fields,
     limit: query.limit,
     page: query.page,
+    where: {
+      active: true,
+    },
   });
 };
 

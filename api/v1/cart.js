@@ -197,7 +197,11 @@ cart.sanitizeBilling = (billing) => {
       'brand',
       'last4',
       'exp_month',
-      'exp_year'
+      'exp_year',
+      'address_check',
+      'zip_check',
+      'cvc_check',
+      'stripe_token',
     ]);
   }
   return billing;
@@ -253,16 +257,16 @@ cart.checkout = (schema, req) => {
       id: req.sessionID,
       cart_id: null,
       order_id: order.id,
+    }).then(session => {
+      return account.getOrderById(schema, {
+        session: {
+          account_id: order.account_id,
+        },
+        params: {
+          id: session.order_id,
+        },
+      });
     });
-  }).then(session => {
-    return schema.get('/orders/{id}', { id: session.order_id });
-    // TODO: fix this
-    // return account.getOrderById(schema, {
-    //   session: req.session,
-    //   params: {
-    //     id: session.order_id,
-    //   },
-    // });
   });
 };
 
