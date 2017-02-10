@@ -68,13 +68,35 @@ session.getByRequest = (schema, req) => {
             if (result.toObject) {
               result = result.toObject();
             }
-            result.currency = self.currency;
+            result.currency = result.currency || self.currency;
             result.locale = self.locale;
             result.timezone = self.timezone;
           }
+        }).then(() => {
+          return session.getCurrencies(schema).then(rating => {
+            result.currencies = rating.toObject();
+          });
+        }).then(() => {
           return result;
         });
       }
+    });
+  });
+};
+
+// Get currency rating
+session.getCurrencies = (schema) => {
+  return Promise.try(() => {
+    if (session.currencies) {
+      return session.currencies;
+    }
+    return schema.get('/:currencies').then(result => {
+      // Cache for 1 hour
+      session.currencies = result;
+      setTimeout(() => {
+        delete session.currencies;
+      }, 3600000);
+      return result;
     });
   });
 };
