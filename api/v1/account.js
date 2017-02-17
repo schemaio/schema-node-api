@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const util = require('../util');
 const session = require('./session');
 
@@ -16,8 +17,13 @@ account.init = (env, router, schema) => {
   router.get('/account/orders', requireSession, requireAccount, account.getOrders.bind(this, schema));
   router.get('/account/orders/:id', requireSession, requireAccount, account.getOrderById.bind(this, schema));
   router.get('/account/addresses', requireSession, requireAccount, account.getAddresses.bind(this, schema));
+  router.delete('/account/addresses/:id', requireSession, requireAccount, account.removeAddress.bind(this, schema));
   router.get('/account/cards', requireSession, requireAccount, account.getCards.bind(this, schema));
+  router.delete('/account/cards/:id', requireSession, requireAccount, account.removeCard.bind(this, schema));
   router.get('/account/reviews', requireSession, requireAccount, account.getReviews.bind(this, schema));
+  router.post('/account/reviews', requireSession, requireAccount, account.createReview.bind(this, schema));
+  router.get('/account/reviews/:id', requireSession, requireAccount, account.getReviewById.bind(this, schema));
+  router.get('/account/review-products', requireSession, requireAccount, account.getReviewProducts.bind(this, schema));
   router.get('/account/credits', requireSession, requireAccount, account.getCredits.bind(this, schema));
 };
 
@@ -305,7 +311,7 @@ account.getOrders = (schema, req) => {
   });
 };
 
-// Get account orders list
+// Get account order by ID
 account.getOrderById = (schema, req) => {
   const query = req.query || {};
   return schema.get('/orders/{id}', {
@@ -324,6 +330,21 @@ account.getAddresses = (schema, req) => {
     fields: query.fields,
     limit: query.limit,
     page: query.page,
+    where: {
+      active: true,
+    },
+  });
+};
+
+// Remove an account address
+account.removeAddress = (schema, req) => {
+  return schema.put('/accounts/{id}/addresses/{address_id}', {
+    id: req.session.account_id,
+    address_id: req.params.id,
+    active: false,
+  }).return({
+    id: req.params.id,
+    success: true
   });
 };
 
@@ -341,14 +362,96 @@ account.getCards = (schema, req) => {
   });
 };
 
+// Remove an account card
+account.removeCard = (schema, req) => {
+  return schema.put('/accounts/{id}/cards/{card_id}', {
+    id: req.session.account_id,
+    card_id: req.params.id,
+    active: false,
+  }).return({
+    id: req.params.id,
+    success: true
+  });
+};
+
 // Get account reviews list
 account.getReviews = (schema, req) => {
   const query = req.query || {};
-  return schema.get('/reviews', {
+  return schema.get('/products:reviews', {
     account_id: req.session.account_id,
     fields: query.fields,
     limit: query.limit,
     page: query.page,
+    expand: 'parent',
+  });
+};
+
+// Get account review by ID
+account.getReviewById = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/products:reviews/{id}', {
+    account_id: req.session.account_id,
+    id: req.params.id,
+    fields: query.fields,
+    expand: 'parent',
+  });
+};
+
+// Create a product review
+account.createReview = (schema, req) => {
+  const data = {
+    account_id: req.session.account_id,
+    parent_id: req.body.parent_id,
+    name: req.body.name,
+    title: req.body.title,
+    comments: req.body.comments,
+    rating: req.body.rating,
+  };
+  return schema.get('/products:reviews/:last', {
+    account_id: req.session.account_id,
+    parent_id: req.body.parent_id,
+  }).then(ex => {
+    if (ex) {
+      if (!ex.approved) {
+        // Update not-yet-approved review
+        data.id = ex.id;
+        return schema.put('/products:reviews/{id}', data).then(review => {
+          return account.getReviewById(schema, {
+            session: req.session,
+            params: { id: ex.id },
+          });
+        });
+      } else {
+        return { error: 'You have already reviewed this product' };
+      }
+    }
+    return schema.post('/products:reviews', data);
+  });
+};
+
+// Get products reviewable by account
+account.getReviewProducts = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/orders', {
+    account_id: req.session.account_id,
+    fields: 'items.product_id',
+    limit: null,
+  }).then(orders => {
+    return _.uniq(
+      _.flatten(
+        orders.results.map(order =>
+          order.items.map(item => item.product_id)
+        )
+      )
+    );
+  }).then(productIds => {
+    return schema.get('/products', {
+      id: { $in: productIds },
+      fields: 'name, images',
+      limit: null,
+    });
+  }).then(products => {
+    return products.results.map(product => product.toObject());
   });
 };
 
