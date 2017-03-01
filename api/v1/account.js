@@ -307,6 +307,7 @@ account.getOrders = (schema, req) => {
     fields: query.fields,
     limit: query.limit,
     page: query.page,
+    sort: query.sort,
     expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
   });
 };
