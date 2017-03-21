@@ -337,6 +337,16 @@ account.getAddresses = (schema, req) => {
   });
 };
 
+//Get account address by ID
+account.getAddressById = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/accounts/{id}/addresses/{address_id}', {
+    id: req.session.account_id,
+    address_id: req.params.id,
+    fields: query.fields
+  });
+};
+
 // Remove an account address
 account.removeAddress = (schema, req) => {
   return schema.put('/accounts/{id}/addresses/{address_id}', {
@@ -360,6 +370,16 @@ account.getCards = (schema, req) => {
     where: {
       active: true,
     },
+  });
+};
+
+//Get account card by ID
+account.getCardById = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/accounts/{id}/cards/{card_id}', {
+    id: req.session.account_id,
+    card_id: req.params.id,
+    fields: query.fields
   });
 };
 
