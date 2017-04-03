@@ -368,10 +368,10 @@ cart.validateProduct = (schema, data) => {
     var productId = product.id;
     var variantId = product.variant && product.variant.id;
     if (!product.id) {
-      throw new util.error(400, 'Product not found');
+      throw util.error(400, 'Product not found');
     }
     if (product.delivery === 'subscription') {
-      throw new util.error(400, 'Subscription products cannot be added to a cart');
+      throw util.error(400, 'Subscription products cannot be added to a cart');
     }
     if (product.variable && !data.variant_id) {
       // Return first variant
@@ -386,10 +386,10 @@ cart.validateProduct = (schema, data) => {
       });
     }
     if (data.variant_id && !product.variant) {
-      throw new util.error(400, 'Variant not found for this product (' + product.name + ')');
+      throw util.error(400, 'Variant not found for this product (' + product.name + ')');
     }
     if (data.variant_id && !product.variable) {
-      throw new util.error(400, 'Product is not variable (' + product.name + ')');
+      throw util.error(400, 'Product is not variable (' + product.name + ')');
     }
     // Valid
     data.product_id = productId;
