@@ -94,7 +94,6 @@ describe('/v1/cart', () => {
           url: '/carts/{cart_id}',
           data: {
             cart_id: 123,
-            account_id: undefined,
             $promotions: true,
             shipping: { name: 'Test Customer' },
           },
@@ -130,7 +129,6 @@ describe('/v1/cart', () => {
           url: '/carts/{cart_id}',
           data: {
             cart_id: 123,
-            account_id: undefined,
             $promotions: true,
             items: [{
               product_id: 1,
@@ -197,7 +195,6 @@ describe('/v1/cart', () => {
           url: '/carts/{cart_id}',
           data: {
             cart_id: 123,
-            account_id: undefined,
             $promotions: true,
             shipping: { name: 'Test Customer' },
           },
@@ -232,7 +229,6 @@ describe('/v1/cart', () => {
           url: '/carts/{cart_id}',
           data: {
             cart_id: 123,
-            account_id: undefined,
             $promotions: true,
             items: [{
               product_id: 1,

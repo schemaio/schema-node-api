@@ -74,7 +74,7 @@ session.getByRequest = (schema, req) => {
           }
         }).then(() => {
           return session.getCurrencies(schema).then(rating => {
-            result.currencies = rating.toObject();
+            result.currencies = rating && rating.toObject();
           });
         }).then(() => {
           return result;

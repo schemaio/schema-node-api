@@ -91,6 +91,10 @@ Test.schemaClient = (sessionId) => {
           id: 'test',
         },
       },
+      {
+        method: 'get',
+        url: '/:currencies',
+      },
     ]);
     return schema;
   };
@@ -113,6 +117,10 @@ Test.schemaClient = (sessionId) => {
           id: 'test',
         },
       },
+      {
+        method: 'get',
+        url: '/:currencies',
+      },
     ]);
     return schema;
   };
@@ -134,6 +142,10 @@ Test.schemaClient = (sessionId) => {
         result: {
           id: 'test',
         },
+      },
+      {
+        method: 'get',
+        url: '/:currencies',
       },
     ]);
     return schema;

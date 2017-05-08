@@ -9,12 +9,6 @@ describe('/v1/account', () => {
   });
 
   describe('GET /v1/account', () => {
-    it('throws an error when logged out', () => {
-      return api.get('/v1/account').then(result => {
-        assert.ok(result && result.error);
-      });
-    });
-
     describe('when logged in', () => {
       beforeEach(() => {
         schema.reset();
@@ -187,7 +181,8 @@ describe('/v1/account', () => {
           data: {
             id: schema.sessionId,
             account_id: 123,
-            account_group: undefined
+            account_group: undefined,
+            email: 'customer@example.com',
           }
         }
       ]);
@@ -229,6 +224,7 @@ describe('/v1/account', () => {
             id: schema.sessionId,
             account_id: null,
             account_group: null,
+            email: null,
           }
         }
       ]);
@@ -366,6 +362,9 @@ describe('/v1/account', () => {
               account_id: schema.sessionId,
               fields: undefined,
               limit: undefined,
+              page: undefined,
+              sort: undefined,
+              expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
             },
             result: {
               count: 0,
@@ -405,6 +404,7 @@ describe('/v1/account', () => {
               id: '1',
               account_id: schema.sessionId,
               fields: undefined,
+              expand: 'items.product, items.variant, items.bundle_items.product, items.bundle_items.variant',
             },
             result: {
               id: '1',
