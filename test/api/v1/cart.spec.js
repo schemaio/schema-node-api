@@ -273,7 +273,7 @@ describe('/v1/cart', () => {
   });
 
   describe('POST /v1/cart/add-item', () => {
-    schema.expectCartAddItem = (itemProps) => {
+    schema.expectCartAddItem = (itemProps = {}) => {
       const item = _.merge(
         {
           product_id: 1,
@@ -306,6 +306,57 @@ describe('/v1/cart', () => {
       return schema;
     };
 
+    schema.expectCartAddItemWithVariant = (itemProps = {}) => {
+      const item = _.merge(
+        {
+          product_id: 1,
+          variant_id: 2,
+          quantity: 2,
+        },
+        itemProps
+      );
+      schema.expectCart().expects([
+        {
+          method: 'get',
+          url: '/products/{product_id}',
+          data: {
+            product_id: 1,
+            active: true,
+            include: {
+              variant: {
+                url: '/products:variants/2',
+                data: {
+                  parent_id: 1,
+                  active: true
+                }
+              }
+            }
+          },
+          result: {
+            id: 1,
+            variable: true,
+            variant: {
+              id: 2,
+            }
+          },
+        },
+        {
+          method: 'post',
+          url: '/carts/{cart_id}/items',
+          data: _.merge({}, item, { cart_id: 123 }),
+        },
+        {
+          method: 'get',
+          url: '/carts/{id}',
+          result: {
+            id: 123,
+            items: [ item ],
+          },
+        },
+      ]);
+      return schema;
+    };
+
     it('adds an item to cart', () => {
       schema.expectCartAddItem();
       api.post('/v1/cart/add-item', {
@@ -316,6 +367,24 @@ describe('/v1/cart', () => {
           id: 123,
           items: [{
             product_id: 1,
+            quantity: 2,
+          }],
+        });
+      });
+    });
+
+    it('adds an item with variant to cart', () => {
+      schema.expectCartAddItemWithVariant();
+      api.post('/v1/cart/add-item', {
+        product_id: 1,
+        variant_id: 2,
+        quantity: 2,
+      }).then(result => {
+        assert.deepEqual(result, {
+          id: 123,
+          items: [{
+            product_id: 1,
+            variant_id: 2,
             quantity: 2,
           }],
         });

@@ -355,10 +355,9 @@ cart.validateProduct = (schema, data) => {
     active: true,
     include: {
       variant: {
-        url: '/products:variants/{variant_id}',
+        url: '/products:variants/'+data.variant_id,
         data: {
           parent_id: data.product_id,
-          variant_id: data.variant_id,
           active: true
         }
       }
