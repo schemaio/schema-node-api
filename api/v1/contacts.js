@@ -56,7 +56,7 @@ contacts.sanitizeEmailOptinLists = (req, optin) => {
   let listArray;
   if (typeof reqLists === 'string') {
     listArray = reqLists.split(/\s*,\s*/);
-  } else if (reqLists instanceof Array) {
+  } else if (Array.isArray(reqLists)) {
     listArray = reqLists;
   }
 
