@@ -46,7 +46,7 @@ util.filterData = (data, fields) => {
   if (!data) {
     return data;
   }
-  if (data instanceof Array) {
+  if (Array.isArray(data)) {
     data.forEach((val, i) => {
       data[i] = util.filterData(val, fields);
     });
