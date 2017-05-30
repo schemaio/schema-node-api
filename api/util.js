@@ -9,7 +9,7 @@ util.cleanData = (data) => {
     const key = keys[i];
     if(data[key] === undefined){
        delete data[key];
-    } else if (data[key] instanceof Array) {
+    } else if (Array.isArray(data[key])) {
       for (let x = 0; x < data[key].length; x++) {
         if (data[key][x] === undefined) {
           data[key].splice(x, 1);
@@ -46,7 +46,7 @@ util.filterData = (data, fields) => {
   if (!data) {
     return data;
   }
-  if (data instanceof Array) {
+  if (Array.isArray(data)) {
     data.forEach((val, i) => {
       data[i] = util.filterData(val, fields);
     });
@@ -66,7 +66,7 @@ util.filterData = (data, fields) => {
 // Ensure some fields are required in data
 // Returns errors
 util.requireFields = (data, fields, errors) => {
-  if (!(fields instanceof Array)) {
+  if (Array.isArray(fields)) {
     fields = [fields];
   }
   fields.forEach(fieldPath => {

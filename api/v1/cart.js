@@ -48,18 +48,33 @@ cart.update = (schema, req) => {
       cartData.account_id = null;
       cartData.account = { email: accountEmail };
     }
+
     if (req.body.shipping !== undefined) {
       cartData.shipping = cart.sanitizeShipping(req.body.shipping);
     }
     if (req.body.billing !== undefined) {
       cartData.billing = cart.sanitizeBilling(req.body.billing);
     }
-    if (req.body.coupon_code !== undefined) {
-      cartData.coupon_code = req.body.coupon_code;
-    }
-    if (req.body.shipment_rating !== undefined) {
-      cartData.shipment_rating = req.body.shipment_rating;
-    }
+
+    var aAllowedProperties = [
+      'coupon_code',
+      'shipment_rating'
+    ];
+
+    var aAllowedFieldUpdateOperators = [
+      '$inc',
+      '$set',
+      '$unset'
+    ];
+
+    var aProperties = aAllowedProperties.concat(aAllowedFieldUpdateOperators);
+
+    aProperties.forEach((val) => {
+      if (req.body[val] !== undefined) {
+        cartData[val] = req.body[val];
+      }
+    });
+
     return schema.put('/carts/{cart_id}', cartData).then(result => {
       // Update anonymous account if created new
       if (accountEmail && result.account.id && !result.account.name) {
