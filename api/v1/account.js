@@ -98,7 +98,10 @@ account.create = (schema, req, res) => {
 
 // Login account
 account.login = (schema, req) => {
-  return schema.get('/accounts/:login', req.body).then(result => {
+  return schema.get('/accounts/:login', {
+    email: req.body.email,
+    password: req.body.password,
+  }).then(result => {
     if (!result) {
       if (req.session.account_id) {
         return account.loginSession(schema, req, null);
