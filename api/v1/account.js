@@ -72,6 +72,24 @@ account.create = (schema, req, res) => {
   req.body.type = 'individual'; // Default type
   return schema.post('/accounts', req.body).then(result => {
     if (result.errors) {
+      // Allow to register if account exists without a password
+      const exists = result.errors.email && result.errors.email.code === 'UNIQUE';
+      if (exists && req.body.password) {
+        return schema.get('/accounts/:last', {
+          email: req.body.email,
+          password: null
+        }).then(account => {
+          if (account) {
+            return schema.put('/accounts/{id}', {
+              id: account.id,
+              password: req.body.password
+            }).then(result => {
+              return account.loginSession(schema, req, result);
+            });
+          }
+          return result;
+        });
+      }
       return result;
     }
     return account.loginSession(schema, req, result);
@@ -98,6 +116,11 @@ account.logout = (schema, req) => {
     account_id: null,
     account_group: null,
     email: null,
+  }).then(() => {
+    return schema.put('/carts/{id}', {
+      id: req.session.cart_id,
+      account_id: null
+    });
   }).return({
     success: true
   });

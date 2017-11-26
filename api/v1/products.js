@@ -7,6 +7,7 @@ const products = module.exports;
 products.init = (env, router, schema) => {
   router.get('/products', cache(env), products.get.bind(this, schema));
   router.get('/products/:id', cache(env), products.getById.bind(this, schema));
+  router.get('/products/:id/reviews', cache(env), products.getReviews.bind(this, schema));
 };
 
 // Get many products
@@ -45,6 +46,18 @@ products.getByCategory = (schema, req) => {
       limit: req.query.limit || 15,
       page: req.query.page || 1
     });
+  });
+};
+
+// Get product reviews
+products.getReviews = (schema, req) => {
+  const query = req.query || {};
+  return schema.get('/products/{id}/reviews', {
+    id: req.params.id,
+    fields: query.fields,
+    limit: query.limit,
+    page: query.page,
+    approved: true,
   });
 };
 
