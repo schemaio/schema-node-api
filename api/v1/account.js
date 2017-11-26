@@ -190,7 +190,14 @@ account.recoverEmail = (schema, req) => {
     email: req.body.email
   }).then(result => {
     if (!result) {
-      return;
+      return {
+        errors: {
+          email: {
+            code: 'REQUIRED',
+            message: 'Invalid email address entered'
+          }
+        }
+      };
     }
 
     return schema.put('/accounts/{id}', {
